@@ -63,14 +63,11 @@ def data_frame_demo():
             % e.reason
         )
 
-st.set_page_config(page_title="DataFrame Demo", page_icon="📊")
-st.markdown("# DataFrame Demo")
-st.sidebar.header("DataFrame Demo")
-st.write(
-    """This demo shows how to use `st.write` to visualize Pandas DataFrames.
-(Data courtesy of the [UN Data Explorer](http://data.un.org/Explorer.aspx).)"""
-)
+st.set_page_config(page_title="Divide 2 Numbers", page_icon="")
+st.markdown("# Divide 2 Numbers")
+st.sidebar.header("Divide 2 Numbers")
+
 
 data_frame_demo()
 
-show_code(data_frame_demo)
+
