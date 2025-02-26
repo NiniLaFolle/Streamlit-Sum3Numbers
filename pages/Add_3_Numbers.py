@@ -1,17 +1,3 @@
-# Copyright 2018-2022 Streamlit Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import streamlit as st
 import random
 import time
@@ -25,13 +11,20 @@ def add_3_numbers():
 
     st.title("Jeu de Calcul Mental")
 
+    # 🔹 Ensure session state variables are initialized
     if "questions" not in st.session_state:
         st.session_state.questions = []
+    if "current_index" not in st.session_state:
         st.session_state.current_index = 0
+    if "correct_answers" not in st.session_state:
         st.session_state.correct_answers = 0
+    if "start_time" not in st.session_state:
         st.session_state.start_time = None
+    if "game_active" not in st.session_state:
         st.session_state.game_active = False
+    if "user_answers" not in st.session_state:
         st.session_state.user_answers = []
+    if "timer_enabled" not in st.session_state:
         st.session_state.timer_enabled = False
 
     # Choix du nombre de questions, de la valeur maximale et de l'activation du timer
@@ -39,14 +32,18 @@ def add_3_numbers():
         num_questions = st.slider("Choisissez le nombre de questions :", min_value=5, max_value=40, value=10)
         max_value = st.slider("Choisissez la valeur maximale des nombres :", min_value=10, max_value=100, value=10)
         st.session_state.timer_enabled = st.checkbox("Activer le timer")
+
         if st.button("Commencer le jeu"):
             st.session_state.questions = [generate_numbers(max_value) for _ in range(num_questions)]
             st.session_state.current_index = 0
             st.session_state.correct_answers = 0
+            st.session_state.user_answers = []
+            st.session_state.game_active = True
+
+            # 🔹 Only initialize the timer if enabled
             if st.session_state.timer_enabled:
                 st.session_state.start_time = time.time()
-            st.session_state.game_active = True
-            st.session_state.user_answers = []
+
             st.rerun()
 
     if st.session_state.game_active:
@@ -61,6 +58,7 @@ def add_3_numbers():
             if submit_button and user_input:
                 correct_sum = a + b + c
                 st.session_state.user_answers.append((a, b, c, int(user_input), correct_sum))
+
                 if int(user_input) == correct_sum:
                     st.session_state.correct_answers += 1
                     st.success("Bonne réponse !")
@@ -71,10 +69,11 @@ def add_3_numbers():
                 st.rerun()
 
         else:
-            # Fin du jeu
-            if st.session_state.timer_enabled:
+            # 🔹 Check if the timer was enabled before computing elapsed time
+            if st.session_state.timer_enabled and st.session_state.start_time is not None:
                 total_time = time.time() - st.session_state.start_time
                 st.write(f"Temps total : {total_time:.2f} secondes")
+
             st.success(f"Fin du jeu ! Score : {st.session_state.correct_answers}/{len(st.session_state.questions)}")
 
             # Afficher le récapitulatif
@@ -93,13 +92,18 @@ def add_3_numbers():
             st.dataframe(styled_df)
 
             if st.button("Rejouer"):
+                # 🔹 Reset all game states before restarting
                 st.session_state.game_active = False
                 st.session_state.questions = []
+                st.session_state.current_index = 0
+                st.session_state.correct_answers = 0
+                st.session_state.start_time = None
+                st.session_state.user_answers = []
+                st.session_state.timer_enabled = False
                 st.rerun()
 
 st.set_page_config(page_title="Jeu d'addition", page_icon="📈")
 st.markdown("# Additionne 3 nombres")
 st.sidebar.header("Additionne 3 nombres")
-
 
 add_3_numbers()
